@@ -1,0 +1,6 @@
+drug_1,drug_2,severity,warning,recommendation
+Warfarin,Aspirin,HIGH,Increased bleeding risk,Monitor INR and signs of bleeding
+Warfarin,Ibuprofen,HIGH,Increased gastrointestinal bleeding risk,Avoid combination if possible
+Metformin,Alcohol,MODERATE,Increased risk of lactic acidosis,Limit alcohol intake
+Aspirin,Clopidogrel,HIGH,Increased bleeding risk,Monitor patient closely
+Digoxin,Furosemide,MODERATE,Electrolyte imbalance may increase digoxin toxicity,Monitor potassium levels

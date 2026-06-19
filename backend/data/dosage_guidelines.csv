@@ -1,0 +1,10 @@
+medicine_name,adult_dose,max_daily_dose
+Paracetamol,500-1000 mg every 4-6 hours,4000 mg
+Ibuprofen,200-400 mg every 4-6 hours,3200 mg
+Metformin,500 mg twice daily,2550 mg
+Amlodipine,5 mg once daily,10 mg
+Atorvastatin,10-80 mg once daily,80 mg
+Aspirin,75-325 mg once daily,4000 mg
+Warfarin,Individualized based on INR,Individualized
+Azithromycin,500 mg once daily,500 mg
+Amoxicillin,500 mg every 8 hours,3000 mg
