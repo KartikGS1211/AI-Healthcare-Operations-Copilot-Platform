@@ -20,6 +20,7 @@ from app.agents.interaction_agent import (
 from app.repositories.interaction_repository import (
     InteractionRepository
 )
+from app.core.dependencies import doctor_required
 
 router = APIRouter(
     prefix="/interactions",
@@ -32,7 +33,8 @@ router = APIRouter(
 )
 def analyze_interactions(
     patient_id: int,
-    db: Session = Depends(get_db)
+    db: Session = Depends(get_db),
+    _user=Depends(doctor_required)
 ):
 
     prescriptions = (

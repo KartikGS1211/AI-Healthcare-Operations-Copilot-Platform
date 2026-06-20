@@ -31,3 +31,4 @@ Evidence-Based Healthcare Insights
 cd backend
 venv\Scripts\activate
 uvicorn app.main:app --reload
+to add schema in db => python create_tables.py

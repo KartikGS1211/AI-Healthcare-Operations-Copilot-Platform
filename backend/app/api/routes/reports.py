@@ -22,6 +22,7 @@ from app.schemas.report import ReportResponse
 from app.services.file_service import save_report_file
 from app.agents.summary_agent import SummaryAgent
 from app.models.report import Report
+from app.core.dependencies import doctor_required
 
 router = APIRouter(
     prefix="/reports",
@@ -37,7 +38,9 @@ def upload_report(
     patient_id: int = Form(...),
     report_type: str = Form(...),
     file: UploadFile = File(...),
-    db: Session = Depends(get_db)
+    db: Session = Depends(get_db),
+    _user=Depends(doctor_required)
+
 ):
 
     patient = (

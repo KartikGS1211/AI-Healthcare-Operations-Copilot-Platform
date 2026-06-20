@@ -19,6 +19,7 @@ from app.models.interaction import Interaction
 from app.schemas.analytics import (
     DashboardOverview
 )
+from app.core.dependencies import doctor_required
 
 router=APIRouter(
     prefix="/analytics",
@@ -30,7 +31,8 @@ router=APIRouter(
     response_model=DashboardOverview
 )
 def get_dashboard_overview(
-    db:Session = Depends(get_db)
+    db:Session = Depends(get_db),
+    _user=Depends(doctor_required)
 ):
 
     total_patients = (

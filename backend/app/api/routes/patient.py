@@ -9,6 +9,7 @@ from app.schemas.patient import (
     PatientCreate,
     PatientResponse
 )
+from app.core.dependencies import doctor_required
 
 router = APIRouter(
     prefix="/patients",
@@ -37,7 +38,8 @@ def create_patient(
     response_model=list[PatientResponse]
 )
 def get_all_patients(
-    db: Session = Depends(get_db)
+    db: Session = Depends(get_db),
+    _user=Depends(doctor_required)
 ):
 
     return PatientRepository.get_all_patients(db)

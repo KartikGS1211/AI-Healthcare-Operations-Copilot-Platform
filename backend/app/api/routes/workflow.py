@@ -4,6 +4,7 @@ from fastapi import (APIRouter,Depends,HTTPException)
 from sqlalchemy.orm import Session
 from app.database.session import get_db
 from app.agents.workflow import HealthcareWorkflow
+from app.core.dependencies import doctor_required
 
 router=APIRouter(
     prefix="/workflow",
@@ -15,7 +16,8 @@ router=APIRouter(
 )
 def analyze_report(
     report_id:int,
-    db : Session=Depends(get_db)
+    db : Session=Depends(get_db),
+    _user=Depends(doctor_required)
 ):
 
     result=(

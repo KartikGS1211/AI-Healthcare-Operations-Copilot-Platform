@@ -19,6 +19,7 @@ from app.agents.prescription_agent import (
 from app.repositories.prescription_repository import (
     PrescriptionRepository
 )
+from app.core.dependencies import doctor_required
 
 router = APIRouter(
     prefix="/prescriptions",
@@ -31,7 +32,8 @@ router = APIRouter(
 )
 def extract_prescription(
     report_id: int,
-    db: Session = Depends(get_db)
+    db: Session = Depends(get_db),
+    _user=Depends(doctor_required)
 ):
 
     report = (

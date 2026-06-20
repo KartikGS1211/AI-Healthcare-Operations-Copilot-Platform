@@ -1,3 +1,4 @@
+
 from app.database.connection import engine
 from app.database.base import Base
 
@@ -6,6 +7,7 @@ from app.models.patient import Patient
 from app.models.report import Report
 from app.models.prescription import Prescription
 from app.models.interaction import Interaction
+from app.models.user import User
 
 def create_tables():
     print("Registering models...")
@@ -24,6 +26,10 @@ def create_tables():
 
     print(
         f"[OK] {Interaction.__name__} -> {Interaction.__tablename__}"
+    )
+
+    print(
+        f"[OK] {User.__name__} -> {User.__tablename__}"
     )
 
     print("\nCreating database tables...")
