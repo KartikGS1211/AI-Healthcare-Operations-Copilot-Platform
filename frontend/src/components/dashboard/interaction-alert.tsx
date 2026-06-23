@@ -14,11 +14,23 @@ const riskConfig: Record<
     className: "border-accent/30 bg-accent/5",
     badge: "bg-accent/15 text-accent border-accent/30",
   },
-  medium: {
-    label: "Medium Risk",
+  moderate: {
+    label: "Moderate Risk",
     icon: ShieldAlert,
     className: "border-[var(--warning)]/40 bg-[var(--warning)]/10",
     badge: "bg-amber-100 text-amber-800 border-amber-200 dark:bg-amber-950 dark:text-amber-300 dark:border-amber-800",
+  },
+  medium: {
+    label: "Moderate Risk",
+    icon: ShieldAlert,
+    className: "border-[var(--warning)]/40 bg-[var(--warning)]/10",
+    badge: "bg-amber-100 text-amber-800 border-amber-200 dark:bg-amber-950 dark:text-amber-300 dark:border-amber-800",
+  },
+  critical: {
+    label: "Critical Risk",
+    icon: ShieldX,
+    className: "border-destructive bg-destructive/10",
+    badge: "bg-destructive text-destructive-foreground border-destructive",
   },
   high: {
     label: "High Risk",
@@ -33,7 +45,8 @@ interface InteractionAlertProps {
 }
 
 export function InteractionAlert({ interaction }: InteractionAlertProps) {
-  const config = riskConfig[interaction.riskLevel];
+  const level = interaction.riskLevel === "medium" ? "moderate" : interaction.riskLevel;
+  const config = riskConfig[level] ?? riskConfig.low;
   const Icon = config.icon;
 
   return (
@@ -45,7 +58,9 @@ export function InteractionAlert({ interaction }: InteractionAlertProps) {
               className={cn(
                 "flex h-10 w-10 shrink-0 items-center justify-center rounded-lg",
                 interaction.riskLevel === "high" && "bg-destructive/15 text-destructive",
-                interaction.riskLevel === "medium" && "bg-amber-100 text-amber-700 dark:bg-amber-950 dark:text-amber-400",
+                (interaction.riskLevel === "moderate" || interaction.riskLevel === "medium") &&
+                  "bg-amber-100 text-amber-700 dark:bg-amber-950 dark:text-amber-400",
+                interaction.riskLevel === "critical" && "bg-destructive/20 text-destructive",
                 interaction.riskLevel === "low" && "bg-accent/15 text-accent"
               )}
             >

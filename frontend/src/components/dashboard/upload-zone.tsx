@@ -1,6 +1,7 @@
 "use client";
 
 import { useCallback, useState } from "react";
+import { motion } from "framer-motion";
 import { FileUp, Image, FileText, Upload } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Progress } from "@/components/ui/progress";
@@ -63,15 +64,20 @@ export function UploadZone({
   );
 
   return (
-    <Card className={cn("overflow-hidden shadow-sm", className)}>
+    <Card className={cn("overflow-hidden border-border/50 bg-card/80 shadow-sm backdrop-blur-sm", className)}>
       <CardContent className="p-0">
-        <div
+        <motion.div
           onDragOver={(e) => {
             e.preventDefault();
             setIsDragging(true);
           }}
           onDragLeave={() => setIsDragging(false)}
           onDrop={onDrop}
+          animate={
+            isDragging
+              ? { boxShadow: "0 0 30px rgba(59, 130, 246, 0.25)" }
+              : { boxShadow: "0 0 0px rgba(59, 130, 246, 0)" }
+          }
           className={cn(
             "relative flex flex-col items-center justify-center border-2 border-dashed p-10 transition-colors md:p-14",
             isDragging
@@ -79,9 +85,13 @@ export function UploadZone({
               : "border-muted-foreground/25 hover:border-primary/50 hover:bg-muted/30"
           )}
         >
-          <div className="mb-4 flex h-16 w-16 items-center justify-center rounded-2xl bg-primary/10">
+          <motion.div
+            animate={isDragging ? { scale: [1, 1.05, 1] } : { scale: 1 }}
+            transition={{ repeat: isDragging ? Infinity : 0, duration: 1.5 }}
+            className="mb-4 flex h-16 w-16 items-center justify-center rounded-2xl bg-primary/10 ring-2 ring-primary/20"
+          >
             <Upload className="h-8 w-8 text-primary" />
-          </div>
+          </motion.div>
           <h3 className="mb-1 text-lg font-semibold">Drag and drop your file here</h3>
           <p className="mb-4 text-center text-sm text-muted-foreground">
             or click to browse from your device
@@ -113,7 +123,7 @@ export function UploadZone({
               Choose File
             </span>
           </label>
-        </div>
+        </motion.div>
 
         {(uploading || progress === 100) && fileName && (
           <div className="border-t bg-muted/30 p-4">

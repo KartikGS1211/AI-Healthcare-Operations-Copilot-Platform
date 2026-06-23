@@ -1,4 +1,4 @@
-import { Building2, Stethoscope, Syringe } from "lucide-react";
+import { Building2, FileText, Pill, Stethoscope, Syringe } from "lucide-react";
 import { cn } from "@/lib/utils";
 import type { TimelineEvent } from "@/types";
 
@@ -6,6 +6,8 @@ const categoryConfig = {
   diagnosis: { icon: Stethoscope, color: "bg-primary" },
   treatment: { icon: Syringe, color: "bg-accent" },
   visit: { icon: Building2, color: "bg-[var(--warning)]" },
+  report: { icon: FileText, color: "bg-primary" },
+  prescription: { icon: Pill, color: "bg-accent" },
 };
 
 interface TimelineProps {
@@ -16,7 +18,7 @@ export function Timeline({ events }: TimelineProps) {
   return (
     <div className="relative space-y-0">
       {events.map((event, index) => {
-        const config = categoryConfig[event.category];
+        const config = categoryConfig[event.category] ?? categoryConfig.visit;
         const Icon = config.icon;
         const isLast = index === events.length - 1;
 

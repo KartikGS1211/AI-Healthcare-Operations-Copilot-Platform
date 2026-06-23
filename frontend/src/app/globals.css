@@ -129,3 +129,9 @@
     @apply font-sans;
   }
 }
+
+@layer utilities {
+  .glass-card {
+    @apply border-border/50 bg-card/80 shadow-sm backdrop-blur-xl;
+  }
+}

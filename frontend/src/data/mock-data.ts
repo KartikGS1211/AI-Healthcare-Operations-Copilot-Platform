@@ -80,13 +80,21 @@ export const recentActivity: ActivityItem[] = [
 ];
 
 export const weeklyReportData: ChartDataPoint[] = [
-  { name: "Mon", reports: 42, prescriptions: 38 },
-  { name: "Tue", reports: 58, prescriptions: 45 },
-  { name: "Wed", reports: 51, prescriptions: 52 },
-  { name: "Thu", reports: 67, prescriptions: 48 },
-  { name: "Fri", reports: 73, prescriptions: 61 },
-  { name: "Sat", reports: 28, prescriptions: 22 },
-  { name: "Sun", reports: 19, prescriptions: 15 },
+  { name: "Mon", reports: 42, prescriptions: 38, interactions: 8 },
+  { name: "Tue", reports: 58, prescriptions: 45, interactions: 12 },
+  { name: "Wed", reports: 51, prescriptions: 52, interactions: 9 },
+  { name: "Thu", reports: 67, prescriptions: 48, interactions: 15 },
+  { name: "Fri", reports: 73, prescriptions: 61, interactions: 11 },
+  { name: "Sat", reports: 28, prescriptions: 22, interactions: 4 },
+  { name: "Sun", reports: 19, prescriptions: 15, interactions: 3 },
+];
+
+export const topMedicinesChart: ChartDataPoint[] = [
+  { name: "Metformin", value: 142 },
+  { name: "Lisinopril", value: 118 },
+  { name: "Atorvastatin", value: 96 },
+  { name: "Aspirin", value: 84 },
+  { name: "Omeprazole", value: 72 },
 ];
 
 export const monthlyPrescriptionData: ChartDataPoint[] = [
@@ -266,6 +274,44 @@ export const samplePatient: Patient = {
     "Annual Physical — Dec 2025",
   ],
 };
+
+export const mockPatients: Patient[] = [
+  {
+    id: "1",
+    name: "Robert Anderson",
+    age: 62,
+    gender: "Male",
+    phone: "+1 555-0101",
+    bloodType: "O+",
+    mrn: "MRN-2024-8471",
+    conditions: samplePatient.conditions,
+    medications: samplePatient.medications,
+    allergies: samplePatient.allergies,
+    recentReports: samplePatient.recentReports,
+  },
+  {
+    id: "2",
+    name: "Sarah Mitchell",
+    age: 45,
+    gender: "Female",
+    phone: "+1 555-0102",
+    conditions: ["Asthma", "Hypertension"],
+    medications: ["Albuterol", "Losartan"],
+    allergies: ["Latex"],
+    recentReports: ["Pulmonary Function Test — Mar 2026"],
+  },
+  {
+    id: "3",
+    name: "James Chen",
+    age: 38,
+    gender: "Male",
+    phone: "+1 555-0103",
+    conditions: ["Migraine"],
+    medications: ["Sumatriptan"],
+    allergies: [],
+    recentReports: ["Neurology Consult — Feb 2026"],
+  },
+];
 
 export const analyticsKPIs: StatMetric[] = [
   { title: "Patients Processed", value: "8,421", change: "+14.2%", trend: "up", icon: "patients" },

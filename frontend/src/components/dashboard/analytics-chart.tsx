@@ -18,6 +18,7 @@ import {
   YAxis,
 } from "recharts";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { cn } from "@/lib/utils";
 import type { ChartDataPoint } from "@/types";
 
 const CHART_COLORS = [
@@ -35,6 +36,7 @@ interface AnalyticsChartProps {
   type: "area" | "bar" | "line" | "pie" | "multi-bar";
   dataKeys?: string[];
   className?: string;
+  animated?: boolean;
 }
 
 export function AnalyticsChart({
@@ -44,9 +46,14 @@ export function AnalyticsChart({
   type,
   dataKeys = ["value"],
   className,
+  animated = false,
 }: AnalyticsChartProps) {
+  const animationProps = animated
+    ? { animationDuration: 1200, animationBegin: 0 }
+    : { isAnimationActive: false };
+
   return (
-    <Card className={className}>
+    <Card className={cn("border-border/50 bg-card/80 backdrop-blur-sm", className)}>
       <CardHeader>
         <CardTitle className="text-base">{title}</CardTitle>
         {description && <CardDescription>{description}</CardDescription>}
@@ -76,6 +83,7 @@ export function AnalyticsChart({
                     fill={CHART_COLORS[i]}
                     fillOpacity={0.2}
                     strokeWidth={2}
+                    {...animationProps}
                   />
                 ))}
               </AreaChart>
@@ -92,7 +100,7 @@ export function AnalyticsChart({
                     background: "var(--card)",
                   }}
                 />
-                <Bar dataKey={dataKeys[0]} fill={CHART_COLORS[0]} radius={[6, 6, 0, 0]} />
+                <Bar dataKey={dataKeys[0]} fill={CHART_COLORS[0]} radius={[6, 6, 0, 0]} {...animationProps} />
               </BarChart>
             )}
             {type === "multi-bar" && (
@@ -114,6 +122,7 @@ export function AnalyticsChart({
                     dataKey={key}
                     fill={CHART_COLORS[i]}
                     radius={[4, 4, 0, 0]}
+                    {...animationProps}
                   />
                 ))}
               </BarChart>
@@ -139,6 +148,7 @@ export function AnalyticsChart({
                     stroke={CHART_COLORS[i]}
                     strokeWidth={2}
                     dot={{ r: 4 }}
+                    {...animationProps}
                   />
                 ))}
               </LineChart>

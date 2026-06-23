@@ -5,7 +5,8 @@ import { useRouter } from "next/navigation";
 import { Bell, Menu, Moon, Search, Sun } from "lucide-react";
 import { useTheme } from "next-themes";
 import { toast } from "sonner";
-import { useAuth } from "@/components/providers/auth-provider";
+import { useAuthStore } from "@/store/auth-store";
+import { useAuth } from "@/hooks/use-auth";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
@@ -22,12 +23,18 @@ import {
 
 interface NavbarProps {
   title: string;
+  settingsHref?: string;
   onMenuClick?: () => void;
 }
 
-export function Navbar({ title, onMenuClick }: NavbarProps) {
+export function Navbar({
+  title,
+  settingsHref = "/settings",
+  onMenuClick,
+}: NavbarProps) {
   const router = useRouter();
-  const { user, logout } = useAuth();
+  const user = useAuthStore((s) => s.user);
+  const { logout } = useAuth();
   const { theme, setTheme } = useTheme();
 
   function handleLogout() {
@@ -37,7 +44,7 @@ export function Navbar({ title, onMenuClick }: NavbarProps) {
   }
 
   return (
-    <header className="sticky top-0 z-30 flex h-16 items-center gap-4 border-b bg-background/95 px-4 backdrop-blur supports-[backdrop-filter]:bg-background/60 md:px-6">
+    <header className="sticky top-0 z-30 flex h-16 items-center gap-4 border-b border-border/50 bg-background/70 px-4 backdrop-blur-xl supports-[backdrop-filter]:bg-background/50 md:px-6">
       <Button
         variant="ghost"
         size="icon"
@@ -59,7 +66,7 @@ export function Navbar({ title, onMenuClick }: NavbarProps) {
           <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
           <Input
             placeholder="Search patients, reports..."
-            className="h-9 pl-9 bg-muted/50"
+            className="h-9 border-border/50 bg-muted/40 pl-9 backdrop-blur-sm"
           />
         </div>
       </div>
@@ -84,7 +91,7 @@ export function Navbar({ title, onMenuClick }: NavbarProps) {
 
         <DropdownMenu>
           <DropdownMenuTrigger className="rounded-full outline-none">
-            <Avatar className="h-9 w-9 cursor-pointer">
+            <Avatar className="h-9 w-9 cursor-pointer ring-2 ring-primary/10">
               <AvatarFallback className="bg-primary/10 text-primary text-xs font-semibold">
                 {user?.initials ?? "?"}
               </AvatarFallback>
@@ -102,10 +109,10 @@ export function Navbar({ title, onMenuClick }: NavbarProps) {
               </DropdownMenuLabel>
             </DropdownMenuGroup>
             <DropdownMenuSeparator />
-            <DropdownMenuItem render={<Link href="/settings" />}>
+            <DropdownMenuItem render={<Link href={settingsHref} />}>
               Profile
             </DropdownMenuItem>
-            <DropdownMenuItem render={<Link href="/settings" />}>
+            <DropdownMenuItem render={<Link href={settingsHref} />}>
               Settings
             </DropdownMenuItem>
             <DropdownMenuSeparator />
