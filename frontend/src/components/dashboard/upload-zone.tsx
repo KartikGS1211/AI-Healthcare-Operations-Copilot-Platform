@@ -31,16 +31,17 @@ export function UploadZone({
       setUploading(true);
       setProgress(0);
 
+      let currentProgress = 0;
       const interval = setInterval(() => {
-        setProgress((prev) => {
-          if (prev >= 100) {
-            clearInterval(interval);
-            setUploading(false);
-            onUploadComplete?.(file);
-            return 100;
-          }
-          return prev + 10;
-        });
+        currentProgress += 10;
+        if (currentProgress >= 100) {
+          clearInterval(interval);
+          setProgress(100);
+          setUploading(false);
+          onUploadComplete?.(file);
+        } else {
+          setProgress(currentProgress);
+        }
       }, 200);
     },
     [onUploadComplete]
