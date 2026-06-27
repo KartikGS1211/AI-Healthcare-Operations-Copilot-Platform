@@ -68,7 +68,7 @@ frontend/
 │   │   ├── prescription.service.ts # Medicine extractions
 │   │   ├── interaction.service.ts  # Drug conflict analysis
 │   │   ├── rag.service.ts      # Vector-search queries
-│   │   ├── analytics.service.ts# Dashboard metrics & top meds
+│   │   ├── analytics.service.ts# Live dashboard overview, top medicines, weekly/monthly trends, and report category distribution
 │   │   └── workflow.service.ts # Triggering coordinate agent flow
 │   ├── store/              # Global stores (e.g., Auth token state)
 │   │   └── auth-store.ts   # User profile and JWT persistence in local storage

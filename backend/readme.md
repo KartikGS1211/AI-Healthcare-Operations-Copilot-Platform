@@ -201,6 +201,10 @@ erDiagram
 - `GET /analytics/overview` - Returns high-level metrics of patients, reports, prescriptions, and interactions. (Requires `doctor` auth).
 - `GET /analytics/top-medicines` - Top 10 most frequently prescribed medications.
 - `GET /analytics/recent-reports` - Fetch the 10 most recently uploaded reports.
+- `GET /analytics/weekly-trends` - Fetch weekly report, prescription, and interaction activity counts for the last 7 days.
+- `GET /analytics/monthly-trends` - Fetch monthly prescription counts for the last 6 months.
+- `GET /analytics/report-distribution` - Fetch categorical distribution counts of reports (e.g. Lab, Radiology, Prescription, Discharge, Other).
+
 
 ---
 

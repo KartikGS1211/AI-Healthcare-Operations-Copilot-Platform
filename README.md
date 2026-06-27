@@ -1,6 +1,6 @@
 # AI Healthcare Operations Copilot Platform
 
-An enterprise-grade, intelligent clinical workstation designed to optimize healthcare operations. The platform integrates **document OCR**, **multi-agent AI reasoning**, **Retrieval-Augmented Generation (RAG)**, and **real-time clinical analysis** to assist doctors with report summarization, prescription tracking, and drug-drug interaction safeguards.
+An enterprise-grade, intelligent clinical workstation designed to optimize healthcare operations. The platform integrates **document OCR**, **multi-agent AI reasoning**, **Retrieval-Augmented Generation (RAG)**, **live database-driven analytical trend reporting**, and **real-time clinical analysis** to assist doctors with report summarization, prescription tracking, and drug-drug interaction safeguards.
 
 ---
 
@@ -101,6 +101,7 @@ The platform uses JWT payloads to enforce security scopes between clinical roles
   - Upload lab reports or prescription documents for OCR parsing.
   - Run AI agents to extract medicines, summarize files, and check cross-interactions.
   - Search clinical rules inside the RAG medical explorer.
+  - Track live weekly/monthly operational trends and report category distributions.
 - **Patient Portal** (`/patient-dashboard`):
   - Simple, readable views showing active prescriptions, clinical warning banners, and summaries.
 
