@@ -28,3 +28,9 @@ class Settings(BaseSettings):
         case_sensitive = True
 
 settings = Settings()
+
+if settings.SECRET_KEY == "development-secret":
+    raise ValueError(
+        "SECRET_KEY must be changed before production."
+    )
+

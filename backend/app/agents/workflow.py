@@ -1,6 +1,7 @@
 # pyrefly: ignore [missing-import]
-from app.agents.coordinate_agent import CoordinatorAgent
-from app.models import Report
+from fastapi.responses import StreamingResponse
+from app.agents.coordinator import CoordinatorAgent
+from app.models.report import Report
 # pyrefly: ignore [missing-import, parse-error]
 from sqlalchemy.orm import Session
 
@@ -23,10 +24,7 @@ class HealthcareWorkflow:
         if not report:
             return None
 
-        result=(
-            CoordinatorAgent.process_report(
-                report
-            )
-        )
-
-        return result
+        return StreamingResponse(
+            CoordinatorAgent.process_report_stream(report, db),
+            media_type="text/event-stream"
+        )

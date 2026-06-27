@@ -1,13 +1,21 @@
 # pyrefly: ignore [missing-import]
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends, HTTPException, status, Request
 # pyrefly: ignore [missing-import]
 from sqlalchemy.orm import Session
+from pydantic import BaseModel
 
 from app.database.session import get_db
 from app.repositories.user_repository import UserRepository
 from app.schemas.auth import UserCreate, UserLogin, TokenResponse
 from app.models.user import User
-from app.core.security import hash_password, verify_password, create_access_token
+from app.core.security import (
+    hash_password,
+    verify_password,
+    create_access_token,
+    create_refresh_token,
+    verify_refresh_token,
+    limiter
+)
 # pyrefly: ignore [missing-import]
 from fastapi.security import OAuth2PasswordRequestForm
 
@@ -15,6 +23,19 @@ router = APIRouter(
     prefix="/auth",
     tags=["Authentication"]
 )
+
+class RefreshTokenRequest(BaseModel):
+    refresh_token: str
+
+class RefreshTokenResponse(BaseModel):
+    access_token: str
+    token_type: str = "bearer"
+
+class ExtendedTokenResponse(BaseModel):
+    access_token: str
+    refresh_token: str
+    token_type: str = "bearer"
+    role: str
 
 @router.post("/register", status_code=status.HTTP_201_CREATED)
 def register(
@@ -42,8 +63,11 @@ def register(
         "full_name": created_user.full_name,
         "role": created_user.role
     }
-@router.post("/login", response_model=TokenResponse)
+
+@router.post("/login", response_model=ExtendedTokenResponse)
+@limiter.limit("5/minute")
 def login(
+    request: Request,
     form_data: OAuth2PasswordRequestForm = Depends(),
     db: Session = Depends(get_db)
 ):
@@ -69,8 +93,42 @@ def login(
         }
     )
 
-    return TokenResponse(
+    refresh_token = create_refresh_token(user_id=user.email)
+
+    return ExtendedTokenResponse(
         access_token=access_token,
+        refresh_token=refresh_token,
         token_type="bearer",
         role=user.role
+    )
+
+@router.post("/refresh", response_model=RefreshTokenResponse)
+def refresh(
+    payload: RefreshTokenRequest,
+    db: Session = Depends(get_db)
+):
+    user_email = verify_refresh_token(payload.refresh_token)
+    if not user_email:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Invalid or expired refresh token"
+        )
+    
+    user = UserRepository.get_by_email(db, email=user_email)
+    if not user:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="User not found"
+        )
+        
+    access_token = create_access_token(
+        data={
+            "sub": user.email,
+            "role": user.role
+        }
+    )
+    
+    return RefreshTokenResponse(
+        access_token=access_token,
+        token_type="bearer"
     )
