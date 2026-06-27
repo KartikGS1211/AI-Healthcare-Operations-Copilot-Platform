@@ -16,4 +16,20 @@ export const analyticsService = {
     const { data } = await api.get<ApiReport[]>("/analytics/recent-reports");
     return data;
   },
+
+  async getWeeklyTrends(): Promise<any[]> {
+    const { data } = await api.get<any[]>("/analytics/weekly-trends");
+    return data;
+  },
+
+  async getMonthlyTrends(): Promise<any[]> {
+    const { data } = await api.get<any[]>("/analytics/monthly-trends");
+    return data;
+  },
+
+  async getReportDistribution(): Promise<any[]> {
+    const { data } = await api.get<any[]>("/analytics/report-distribution");
+    return data;
+  },
 };
+

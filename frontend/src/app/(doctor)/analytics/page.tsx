@@ -5,14 +5,7 @@ import { StatCard } from "@/components/dashboard/stat-card";
 import { AnalyticsChart } from "@/components/dashboard/analytics-chart";
 import { DataTable, StatusBadge } from "@/components/dashboard/data-table";
 import { analyticsService } from "@/services/analytics.service";
-import {
-  analyticsActivity,
-  analyticsKPIs,
-  interactionCategories,
-  prescriptionTrends,
-  reportAnalysisTrends,
-  topMedicinesChart,
-} from "@/data/mock-data";
+
 import type { AnalyticsActivity } from "@/types";
 
 const activityColumns = [
@@ -43,44 +36,59 @@ export default function AnalyticsPage() {
     queryFn: () => analyticsService.getRecentReports(),
   });
 
-  const kpis = overview
-    ? [
-        {
-          title: "Total Patients",
-          value: overview.total_patients,
-          change: "+14.2%",
-          trend: "up" as const,
-          icon: "patients",
-        },
-        {
-          title: "Reports Uploaded",
-          value: overview.total_reports,
-          change: "+9.8%",
-          trend: "up" as const,
-          icon: "report",
-        },
-        {
-          title: "Prescriptions",
-          value: overview.total_prescriptions,
-          change: "+18.7%",
-          trend: "up" as const,
-          icon: "prescription",
-        },
-        {
-          title: "Interactions",
-          value: overview.total_interactions,
-          change: "-2.4%",
-          trend: "down" as const,
-          icon: "interactions",
-        },
-      ]
-    : analyticsKPIs;
+  const { data: weeklyTrends } = useQuery({
+    queryKey: ["weekly-trends"],
+    queryFn: () => analyticsService.getWeeklyTrends(),
+  });
 
-  const topMedsData = topMeds && topMeds.length > 0
+  const { data: reportDistribution } = useQuery({
+    queryKey: ["report-distribution"],
+    queryFn: () => analyticsService.getReportDistribution(),
+  });
+
+
+  const kpis = [
+    {
+      title: "Total Patients",
+      value: overview?.total_patients ?? 0,
+      change: overview ? "+14.2%" : "",
+      trend: overview ? ("up" as const) : ("neutral" as const),
+      icon: "patients",
+    },
+    {
+      title: "Reports Uploaded",
+      value: overview?.total_reports ?? 0,
+      change: overview ? "+9.8%" : "",
+      trend: overview ? ("up" as const) : ("neutral" as const),
+      icon: "report",
+    },
+    {
+      title: "Prescriptions",
+      value: overview?.total_prescriptions ?? 0,
+      change: overview ? "+18.7%" : "",
+      trend: overview ? ("up" as const) : ("neutral" as const),
+      icon: "prescription",
+    },
+    {
+      title: "Interactions",
+      value: overview?.total_interactions ?? 0,
+      change: overview ? "-2.4%" : "",
+      trend: overview ? ("down" as const) : ("neutral" as const),
+      icon: "interactions",
+    },
+  ];
+
+  const topMedsData = topMeds
     ? topMeds.map((m) => ({ name: m.medicine_name, value: m.count }))
-    : topMedicinesChart;
+    : [];
 
-  const activities: AnalyticsActivity[] = recentReports && recentReports.length > 0
+  const weeklyTrendsData = weeklyTrends ?? [];
+
+  const prescriptionTrendsData = weeklyTrends ?? [];
+
+  const reportDistributionData = reportDistribution ?? [];
+
+  const activities: AnalyticsActivity[] = recentReports
     ? recentReports.map((report, idx) => ({
         id: String(report.id),
         patient: `Patient #${report.patient_id}`,
@@ -88,7 +96,9 @@ export default function AnalyticsPage() {
         status: "completed" as const,
         timestamp: new Date(report.uploaded_at).toLocaleDateString(),
       }))
-    : analyticsActivity;
+    : [];
+
+
 
   return (
     <div className="space-y-6">
@@ -109,7 +119,7 @@ export default function AnalyticsPage() {
         <AnalyticsChart
           title="Weekly Reports"
           description="Reports processed per week"
-          data={reportAnalysisTrends}
+          data={weeklyTrendsData}
           type="line"
           dataKeys={["uploaded", "analyzed"]}
           animated
@@ -128,7 +138,7 @@ export default function AnalyticsPage() {
         <AnalyticsChart
           title="Interaction Trends"
           description="Prescriptions vs interaction alerts"
-          data={prescriptionTrends}
+          data={prescriptionTrendsData}
           type="multi-bar"
           dataKeys={["prescriptions", "interactions"]}
           animated
@@ -136,7 +146,7 @@ export default function AnalyticsPage() {
         <AnalyticsChart
           title="Report Analytics"
           description="Distribution by category"
-          data={interactionCategories}
+          data={reportDistributionData}
           type="pie"
           animated
         />

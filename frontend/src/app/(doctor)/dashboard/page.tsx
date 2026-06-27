@@ -21,13 +21,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { cn } from "@/lib/utils";
 import { useAuthStore } from "@/store/auth-store";
 import { analyticsService } from "@/services/analytics.service";
-import {
-  dashboardKPIs,
-  monthlyPrescriptionData,
-  recentActivity,
-  topMedicinesChart,
-  weeklyReportData,
-} from "@/data/mock-data";
+
 import { staggerContainer, fadeInUp } from "@/lib/animations";
 
 const quickActions = [
@@ -55,40 +49,49 @@ export default function DoctorDashboardPage() {
     queryFn: () => analyticsService.getRecentReports(),
   });
 
-  const kpis = overview
-    ? [
-        {
-          title: "Patients Processed",
-          value: overview.total_patients,
-          change: "+12.5%",
-          trend: "up" as const,
-          icon: "patients",
-        },
-        {
-          title: "Reports Analyzed",
-          value: overview.total_reports,
-          change: "+8.2%",
-          trend: "up" as const,
-          icon: "report",
-        },
-        {
-          title: "AI Summaries Generated",
-          value: overview.total_prescriptions,
-          change: "+18.7%",
-          trend: "up" as const,
-          icon: "summary",
-        },
-        {
-          title: "Drug Interactions",
-          value: overview.total_interactions,
-          change: "-3.1%",
-          trend: "down" as const,
-          icon: "interactions",
-        },
-      ]
-    : dashboardKPIs;
+  const { data: weeklyTrends } = useQuery({
+    queryKey: ["weekly-trends"],
+    queryFn: () => analyticsService.getWeeklyTrends(),
+  });
 
-  const activities = recentReports && recentReports.length > 0
+  const { data: monthlyTrends } = useQuery({
+    queryKey: ["monthly-trends"],
+    queryFn: () => analyticsService.getMonthlyTrends(),
+  });
+
+
+  const kpis = [
+    {
+      title: "Patients Processed",
+      value: overview?.total_patients ?? 0,
+      change: overview ? "+12.5%" : "",
+      trend: overview ? ("up" as const) : ("neutral" as const),
+      icon: "patients",
+    },
+    {
+      title: "Reports Analyzed",
+      value: overview?.total_reports ?? 0,
+      change: overview ? "+8.2%" : "",
+      trend: overview ? ("up" as const) : ("neutral" as const),
+      icon: "report",
+    },
+    {
+      title: "AI Summaries Generated",
+      value: overview?.total_prescriptions ?? 0,
+      change: overview ? "+18.7%" : "",
+      trend: overview ? ("up" as const) : ("neutral" as const),
+      icon: "summary",
+    },
+    {
+      title: "Drug Interactions",
+      value: overview?.total_interactions ?? 0,
+      change: overview ? "-3.1%" : "",
+      trend: overview ? ("down" as const) : ("neutral" as const),
+      icon: "interactions",
+    },
+  ];
+
+  const activities = recentReports
     ? recentReports.map((report) => ({
         id: String(report.id),
         title: "Report Uploaded",
@@ -99,11 +102,16 @@ export default function DoctorDashboardPage() {
         }),
         type: "report" as const,
       }))
-    : recentActivity;
+    : [];
 
-  const topMedsData = topMeds && topMeds.length > 0
+  const topMedsData = topMeds
     ? topMeds.map((m) => ({ name: m.medicine_name, value: m.count }))
-    : topMedicinesChart;
+    : [];
+
+  const weeklyTrendsData = weeklyTrends ?? [];
+
+  const monthlyTrendsData = monthlyTrends ?? [];
+
 
   if (isLoading && !overview) {
     return <DashboardSkeleton />;
@@ -158,7 +166,7 @@ export default function DoctorDashboardPage() {
         <AnalyticsChart
           title="Weekly Analysis"
           description="Reports analyzed vs prescriptions processed"
-          data={weeklyReportData}
+          data={weeklyTrendsData}
           type="area"
           dataKeys={["reports", "prescriptions"]}
           animated
@@ -166,7 +174,7 @@ export default function DoctorDashboardPage() {
         <AnalyticsChart
           title="Monthly Analysis"
           description="Total prescriptions processed per month"
-          data={monthlyPrescriptionData}
+          data={monthlyTrendsData}
           type="bar"
           dataKeys={["value"]}
           animated
@@ -185,7 +193,7 @@ export default function DoctorDashboardPage() {
         <AnalyticsChart
           title="Interaction Trends"
           description="Drug interaction alerts over time"
-          data={weeklyReportData}
+          data={weeklyTrendsData}
           type="line"
           dataKeys={["interactions"]}
           animated
