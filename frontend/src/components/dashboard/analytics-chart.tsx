@@ -1,5 +1,6 @@
 "use client";
 
+import { useEffect, useState } from "react";
 import {
   Area,
   AreaChart,
@@ -48,9 +49,29 @@ export function AnalyticsChart({
   className,
   animated = false,
 }: AnalyticsChartProps) {
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
   const animationProps = animated
     ? { animationDuration: 1200, animationBegin: 0 }
     : { isAnimationActive: false };
+
+  if (!mounted) {
+    return (
+      <Card className={cn("border-border/50 bg-card/80 backdrop-blur-sm", className)}>
+        <CardHeader>
+          <CardTitle className="text-base">{title}</CardTitle>
+          {description && <CardDescription>{description}</CardDescription>}
+        </CardHeader>
+        <CardContent>
+          <div className="h-[280px] w-full bg-neutral-100/50 dark:bg-neutral-800/30 rounded-lg animate-pulse" />
+        </CardContent>
+      </Card>
+    );
+  }
 
   return (
     <Card className={cn("border-border/50 bg-card/80 backdrop-blur-sm", className)}>
@@ -60,7 +81,8 @@ export function AnalyticsChart({
       </CardHeader>
       <CardContent>
         <div className="h-[280px] min-h-[280px] w-full min-w-0">
-          <ResponsiveContainer width="100%" height="100%">
+          <ResponsiveContainer width="100%" height="100%" minWidth={0} minHeight={0}>
+
             {type === "area" && (
               <AreaChart data={data}>
                 <CartesianGrid strokeDasharray="3 3" className="stroke-border" />
