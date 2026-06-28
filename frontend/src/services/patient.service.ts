@@ -21,4 +21,15 @@ export const patientService = {
     const { data } = await api.post<ApiPatient>("/patients/", payload);
     return data;
   },
+
+  async getMe(): Promise<ApiPatient> {
+    const { data } = await api.get<ApiPatient>("/patients/me");
+    return data;
+  },
+
+  async getDashboard(): Promise<any> {
+    const { data } = await api.get<any>("/patients/me/dashboard");
+    return data;
+  },
 };
+

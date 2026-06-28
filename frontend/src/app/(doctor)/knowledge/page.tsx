@@ -36,6 +36,7 @@ export default function KnowledgePage() {
   const [query, setQuery] = useState("");
   const [searching, setSearching] = useState(false);
   const [results, setResults] = useState<RagSearchResult[]>([]);
+  const [hasSearched, setHasSearched] = useState(false);
 
   async function handleSearch(type: string) {
     if (!query.trim()) {
@@ -45,10 +46,11 @@ export default function KnowledgePage() {
 
     setSearching(true);
     setResults([]);
+    setHasSearched(true);
 
     try {
       const data = await ragService.search(query);
-      setResults(data.length ? data : mockResults);
+      setResults(data);
       toast.success(`${type} search complete`);
     } catch {
       setResults(mockResults);
@@ -95,17 +97,34 @@ export default function KnowledgePage() {
         </TabsList>
         <TabsContent value="medicines" className="mt-4 space-y-4">
           {searching && <AIProcessing message="Searching Knowledge..." />}
-          {results.map((result, i) => (
+          {!searching && hasSearched && results.length === 0 && (
+            <div className="text-center py-12 border border-border/50 rounded-xl bg-card/40 text-muted-foreground">
+              No matching records found in ChromaDB. Try searching for "Amoxicillin", "Paracetamol", or "Metformin".
+            </div>
+          )}
+          {!searching && results.map((result, i) => (
             <KnowledgeCard key={i} result={result} index={i} />
           ))}
         </TabsContent>
         <TabsContent value="knowledge" className="mt-4 space-y-4">
-          {results.map((result, i) => (
+          {searching && <AIProcessing message="Searching Knowledge..." />}
+          {!searching && hasSearched && results.length === 0 && (
+            <div className="text-center py-12 border border-border/50 rounded-xl bg-card/40 text-muted-foreground">
+              No matching records found in ChromaDB. Try searching for "Amoxicillin", "Paracetamol", or "Metformin".
+            </div>
+          )}
+          {!searching && results.map((result, i) => (
             <KnowledgeCard key={i} result={result} index={i} />
           ))}
         </TabsContent>
         <TabsContent value="drugs" className="mt-4 space-y-4">
-          {results.map((result, i) => (
+          {searching && <AIProcessing message="Searching Knowledge..." />}
+          {!searching && hasSearched && results.length === 0 && (
+            <div className="text-center py-12 border border-border/50 rounded-xl bg-card/40 text-muted-foreground">
+              No matching interactions found in ChromaDB. Try searching for "Warfarin", "Aspirin", or "Metformin".
+            </div>
+          )}
+          {!searching && results.map((result, i) => (
             <KnowledgeCard key={i} result={result} index={i} />
           ))}
         </TabsContent>
@@ -113,3 +132,4 @@ export default function KnowledgePage() {
     </div>
   );
 }
+

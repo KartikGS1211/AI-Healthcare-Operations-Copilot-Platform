@@ -8,4 +8,12 @@ export const interactionService = {
     );
     return data.interactions;
   },
+
+  async getByPatient(patientId: number): Promise<ApiInteraction[]> {
+    const { data } = await api.get<ApiInteraction[]>(
+      `/interactions/patient/${patientId}`
+    );
+    return data;
+  },
 };
+

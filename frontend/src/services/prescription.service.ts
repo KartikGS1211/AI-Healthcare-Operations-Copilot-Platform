@@ -8,4 +8,12 @@ export const prescriptionService = {
     );
     return data.medicines;
   },
+
+  async getByPatient(patientId: number): Promise<ApiPrescription[]> {
+    const { data } = await api.get<ApiPrescription[]>(
+      `/prescriptions/patient/${patientId}`
+    );
+    return data;
+  },
 };
+
