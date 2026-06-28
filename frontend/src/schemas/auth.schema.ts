@@ -8,9 +8,14 @@ export const loginSchema = z.object({
 export const registerSchema = z.object({
   full_name: z.string().min(2, "Full name is required"),
   email: z.string().email("Enter a valid email address"),
+  phone: z.string().min(10, "Phone number must be at least 10 digits"),
+  gender: z.enum(["male", "female", "other"], {
+    errorMap: () => ({ message: "Select a valid gender" }),
+  }),
   password: z.string().min(6, "Password must be at least 6 characters"),
   role: z.enum(["doctor", "patient"]),
 });
 
 export type LoginFormValues = z.infer<typeof loginSchema>;
 export type RegisterFormValues = z.infer<typeof registerSchema>;
+
