@@ -30,7 +30,7 @@ export function RegisterForm() {
     formState: { errors },
   } = useForm<RegisterFormValues>({
     resolver: zodResolver(registerSchema),
-    defaultValues: { role: "doctor", gender: "male" },
+    defaultValues: { role: "doctor" },
   });
 
   async function onSubmit(values: RegisterFormValues) {
@@ -64,6 +64,8 @@ export function RegisterForm() {
         )}
       </div>
 
+      
+
       <div className="space-y-2">
         <Label>Role</Label>
         <Select
@@ -79,39 +81,6 @@ export function RegisterForm() {
           </SelectContent>
         </Select>
       </div>
-
-      <div className="space-y-2">
-        <Label htmlFor="phone">Phone Number</Label>
-        <Input
-          id="phone"
-          placeholder="e.g. 9876543210"
-          {...register("phone")}
-        />
-        {errors.phone && (
-          <p className="text-xs text-destructive">{errors.phone.message}</p>
-        )}
-      </div>
-
-      <div className="space-y-2">
-        <Label>Gender</Label>
-        <Select
-          value={watch("gender")}
-          onValueChange={(value) => setValue("gender", (value ?? "male") as "male" | "female" | "other")}
-        >
-          <SelectTrigger>
-            <SelectValue placeholder="Select gender" />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="male">Male</SelectItem>
-            <SelectItem value="female">Female</SelectItem>
-            <SelectItem value="other">Other</SelectItem>
-          </SelectContent>
-        </Select>
-        {errors.gender && (
-          <p className="text-xs text-destructive">{errors.gender.message}</p>
-        )}
-      </div>
-
 
       <div className="space-y-2">
         <Label htmlFor="password">Password</Label>
