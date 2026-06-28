@@ -11,6 +11,8 @@ from sqlalchemy.orm import Session
 from app.database.session import get_db
 
 from app.models.prescription import Prescription
+from app.models.interaction import Interaction
+
 
 from app.agents.interaction_agent import (
     InteractionAgent
@@ -96,3 +98,13 @@ def analyze_interactions(
         for interaction in created
     ]
 }
+
+@router.get(
+    "/patient/{patient_id}"
+)
+def get_patient_interactions(
+    patient_id: int,
+    db: Session = Depends(get_db)
+):
+    interactions = db.query(Interaction).filter(Interaction.patient_id == patient_id).order_by(Interaction.created_at.desc()).all()
+    return interactions

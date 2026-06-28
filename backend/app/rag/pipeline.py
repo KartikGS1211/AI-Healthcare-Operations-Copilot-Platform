@@ -18,13 +18,12 @@ class RAGPipeline:
             )
         )
 
-        documents=(
-            results.get(
-                "documents",
-                [[]]
-            )[0]
-        )
+        documents = results.get("documents", [[]])[0]
+        distances = results.get("distances", [[]])[0]
 
-        return "\n".join(
-            documents
-        )
+        filtered_docs = [
+            doc for doc, dist in zip(documents, distances)
+            if dist < 1.25
+        ]
+
+        return "\n".join(filtered_docs)

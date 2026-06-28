@@ -95,3 +95,13 @@ def extract_prescription(
         for medicine in created
     ]
 }
+
+@router.get(
+    "/patient/{patient_id}"
+)
+def get_patient_prescriptions(
+    patient_id: int,
+    db: Session = Depends(get_db)
+):
+    prescriptions = db.query(Prescription).filter(Prescription.patient_id == patient_id).order_by(Prescription.created_at.desc()).all()
+    return prescriptions
