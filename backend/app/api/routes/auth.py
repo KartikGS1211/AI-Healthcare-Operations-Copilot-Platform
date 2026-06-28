@@ -57,6 +57,21 @@ def register(
     )
     
     created_user = UserRepository.create_user(db, new_user)
+    
+    if user_in.role == "patient":
+        from app.models.patient import Patient
+        from sqlalchemy import func
+        existing_patient = db.query(Patient).filter(func.lower(Patient.full_name) == func.lower(user_in.full_name)).first()
+        if not existing_patient:
+            new_patient = Patient(
+                full_name=user_in.full_name,
+                age=30,  # Default age
+                gender=user_in.gender or "unknown",
+                phone=user_in.phone or "N/A"
+            )
+            db.add(new_patient)
+            db.commit()
+
     return {
         "id": created_user.id,
         "email": created_user.email,
