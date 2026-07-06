@@ -1,4 +1,4 @@
-# AI Healthcare Operations Copilot
+# AI Healthcare Operations Copilot - FRONTEND
 
 Welcome to the frontend application of the **AI Healthcare Operations Copilot Platform**. This application is an enterprise-grade medical dashboard built on **Next.js 16** (App Router), **React 19**, and **Tailwind CSS v4**. It features custom dashboard cards, real-time file upload indicators, interactive clinical agents monitoring, drug-drug interaction alerts, RAG search query panels, and responsive doctor-patient workspaces.
 
