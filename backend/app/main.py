@@ -2,8 +2,11 @@
 from fastapi import FastAPI, Depends, HTTPException
 # pyrefly: ignore [missing-import]
 from fastapi.middleware.cors import CORSMiddleware
+# pyrefly: ignore [missing-import]
 from slowapi import _rate_limit_exceeded_handler
+# pyrefly: ignore [missing-import]
 from slowapi.errors import RateLimitExceeded
+# pyrefly: ignore [missing-import]
 from sqlalchemy.orm import Session
 from jose import jwt
 
@@ -24,7 +27,10 @@ app.add_exception_handler(RateLimitExceeded, _rate_limit_exceeded_handler)
 # Configure CORS
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:3000"],
+    allow_origins=[
+        "http://localhost:3000",
+        "https://ai-healthcare-operations-copilot-pl.vercel.app"
+    ],
     allow_credentials=True,
     allow_methods=["GET", "POST", "PUT", "DELETE"],
     allow_headers=["Authorization", "Content-Type"],
@@ -61,4 +67,4 @@ def analyze_report_stream(
             detail="Invalid token"
         )
 
-    return HealthcareWorkflow.run(report_id=report_id, db=db)
+    return HealthcareWorkflow.run(report_id=report_id, db=db)
