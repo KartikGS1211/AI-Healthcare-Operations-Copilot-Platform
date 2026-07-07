@@ -38,6 +38,12 @@ app.add_middleware(
 
 app.include_router(api_router)
 
+# Run database migrations and seed demo accounts on startup
+@app.on_event("startup")
+def on_startup():
+    from create_tables import create_tables
+    create_tables()
+
 # GET endpoint for SSE streaming
 @app.get("/api/workflow/analyze/{report_id}")
 def analyze_report_stream(
