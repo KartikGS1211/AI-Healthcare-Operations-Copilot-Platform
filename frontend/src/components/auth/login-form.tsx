@@ -4,7 +4,7 @@ import { useState } from "react";
 import Link from "next/link";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Eye, EyeOff, Loader2 } from "lucide-react";
+import { Eye, EyeOff, Loader2, Stethoscope, User } from "lucide-react";
 import { useAuth } from "@/hooks/use-auth";
 import { loginSchema, type LoginFormValues } from "@/schemas/auth.schema";
 import { Button } from "@/components/ui/button";
@@ -18,6 +18,7 @@ export function LoginForm() {
   const {
     register,
     handleSubmit,
+    setValue,
     formState: { errors },
   } = useForm<LoginFormValues>({
     resolver: zodResolver(loginSchema),
@@ -25,6 +26,12 @@ export function LoginForm() {
 
   async function onSubmit(values: LoginFormValues) {
     await login(values);
+  }
+
+  async function handleDemoLogin(email: string) {
+    setValue("email", email);
+    setValue("password", "Password123");
+    await login({ email, password: "Password123" });
   }
 
   return (
@@ -82,6 +89,35 @@ export function LoginForm() {
           "Sign in"
         )}
       </Button>
+
+      <div className="relative flex py-2 items-center">
+        <div className="flex-grow border-t border-border/50"></div>
+        <span className="flex-shrink mx-4 text-xs text-muted-foreground uppercase">Or Quick Access Demo</span>
+        <div className="flex-grow border-t border-border/50"></div>
+      </div>
+
+      <div className="grid grid-cols-2 gap-3">
+        <Button
+          type="button"
+          variant="outline"
+          onClick={() => handleDemoLogin("doctor@hospital.org")}
+          disabled={isLoggingIn}
+          className="w-full flex items-center justify-center gap-2 hover:bg-primary/5 hover:text-primary transition-all duration-300"
+        >
+          <Stethoscope className="h-4 w-4 text-primary" />
+          Doctor Demo
+        </Button>
+        <Button
+          type="button"
+          variant="outline"
+          onClick={() => handleDemoLogin("patient@hospital.org")}
+          disabled={isLoggingIn}
+          className="w-full flex items-center justify-center gap-2 hover:bg-indigo-500/5 hover:text-indigo-500 transition-all duration-300"
+        >
+          <User className="h-4 w-4 text-indigo-500" />
+          Patient Demo
+        </Button>
+      </div>
 
       <p className="text-center text-sm text-muted-foreground">
         Don&apos;t have an account?{" "}
