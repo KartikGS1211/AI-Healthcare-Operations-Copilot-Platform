@@ -115,6 +115,7 @@ export interface ApiInteraction {
   mechanism: string;
   warning: string;
   recommendation: string;
+  created_at?: string;
 }
 
 export interface RagSearchResult {

@@ -8,7 +8,12 @@ import { Badge } from "@/components/ui/badge";
 const mockReports = [
   { id: 1, name: "Blood Test Results.pdf", type: "Lab", date: "Jun 1, 2026" },
   { id: 2, name: "Chest X-Ray.png", type: "Radiology", date: "May 15, 2026" },
-  { id: 3, name: "Prescription Scan.jpg", type: "Prescription", date: "Apr 28, 2026" },
+  {
+    id: 3,
+    name: "Prescription Scan.jpg",
+    type: "Prescription",
+    date: "Apr 28, 2026",
+  },
 ];
 
 export default function PatientReportsPage() {
@@ -16,12 +21,16 @@ export default function PatientReportsPage() {
     <div className="space-y-6">
       <div>
         <h2 className="text-2xl font-bold tracking-tight">My Reports</h2>
-        <p className="text-muted-foreground">Upload and view your medical reports.</p>
+        <p className="text-muted-foreground">
+          Upload and view your medical reports.
+        </p>
       </div>
 
       <UploadZone
         onUploadComplete={() =>
-          toast.success("Report uploaded", { description: "Your report is being processed." })
+          toast.success("Report uploaded", {
+            description: "Your report is being processed.",
+          })
         }
       />
 
@@ -33,13 +42,17 @@ export default function PatientReportsPage() {
           {mockReports.map((report) => (
             <div
               key={report.id}
-              className="flex items-center justify-between rounded-lg border p-4"
+              className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between rounded-lg border p-4"
             >
-              <div>
-                <p className="font-medium">{report.name}</p>
+              <div className="min-w-0">
+                <p className="font-medium truncate" title={report.name}>
+                  {report.name}
+                </p>
                 <p className="text-sm text-muted-foreground">{report.date}</p>
               </div>
-              <Badge variant="outline">{report.type}</Badge>
+              <Badge variant="outline" className="w-fit">
+                {report.type}
+              </Badge>
             </div>
           ))}
         </CardContent>

@@ -24,9 +24,15 @@ interface SidebarProps {
   collapsed: boolean;
   onToggle: () => void;
   navItems: readonly SidebarNavItem[];
+  className?: string;
 }
 
-export function Sidebar({ collapsed, onToggle, navItems }: SidebarProps) {
+export function Sidebar({
+  collapsed,
+  onToggle,
+  navItems,
+  className,
+}: SidebarProps) {
   const pathname = usePathname();
   const router = useRouter();
   const user = useAuthStore((s) => s.user);
@@ -42,7 +48,8 @@ export function Sidebar({ collapsed, onToggle, navItems }: SidebarProps) {
     <aside
       className={cn(
         "fixed left-0 top-0 z-40 flex h-screen flex-col border-r border-sidebar-border bg-sidebar/80 backdrop-blur-xl transition-all duration-300",
-        collapsed ? "w-[72px]" : "w-64"
+        collapsed ? "w-[72px]" : "w-64",
+        className,
       )}
     >
       <div className="flex h-16 items-center gap-3 border-b border-sidebar-border px-4">
@@ -54,7 +61,9 @@ export function Sidebar({ collapsed, onToggle, navItems }: SidebarProps) {
             <p className="truncate text-sm font-semibold text-sidebar-foreground">
               {APP_SHORT_NAME}
             </p>
-            <p className="truncate text-xs text-muted-foreground">Healthcare AI</p>
+            <p className="truncate text-xs text-muted-foreground">
+              Healthcare AI
+            </p>
           </div>
         )}
         <Button
@@ -100,7 +109,7 @@ export function Sidebar({ collapsed, onToggle, navItems }: SidebarProps) {
                   "relative flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-colors",
                   isActive
                     ? "text-primary-foreground"
-                    : "text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground"
+                    : "text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground",
                 )}
               >
                 <Icon className="h-5 w-5 shrink-0" />
@@ -116,7 +125,7 @@ export function Sidebar({ collapsed, onToggle, navItems }: SidebarProps) {
         <div
           className={cn(
             "flex items-center gap-3 rounded-lg bg-sidebar-accent/50 p-2 backdrop-blur-sm",
-            collapsed && "justify-center"
+            collapsed && "justify-center",
           )}
         >
           <Avatar className="h-9 w-9 shrink-0">

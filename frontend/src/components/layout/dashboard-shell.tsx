@@ -26,7 +26,9 @@ export function DashboardShell({
   const pathname = usePathname();
   const title =
     pageTitles[pathname] ??
-    Object.entries(pageTitles).find(([path]) => pathname.startsWith(path))?.[1] ??
+    Object.entries(pageTitles).find(([path]) =>
+      pathname.startsWith(path),
+    )?.[1] ??
     "Dashboard";
 
   return (
@@ -35,6 +37,7 @@ export function DashboardShell({
         collapsed={collapsed}
         onToggle={() => setCollapsed(!collapsed)}
         navItems={navItems}
+        className="hidden lg:flex"
       />
 
       <Sheet open={mobileOpen} onOpenChange={setMobileOpen}>
@@ -52,7 +55,7 @@ export function DashboardShell({
       <div
         className={cn(
           "flex min-h-screen flex-col transition-all duration-300",
-          collapsed ? "lg:pl-[72px]" : "lg:pl-64"
+          collapsed ? "lg:pl-[72px]" : "lg:pl-64",
         )}
       >
         <Navbar

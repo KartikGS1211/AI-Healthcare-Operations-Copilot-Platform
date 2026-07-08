@@ -23,7 +23,10 @@ const parseSummary = (text: string | null | undefined): SummarySection[] => {
   if (!text) return [];
 
   const sections: SummarySection[] = [];
-  const lines = text.split("\n").map(l => l.trim()).filter(Boolean);
+  const lines = text
+    .split("\n")
+    .map((l) => l.trim())
+    .filter(Boolean);
   let currentSection: SummarySection | null = null;
 
   for (const line of lines) {
@@ -41,13 +44,13 @@ const parseSummary = (text: string | null | undefined): SummarySection[] => {
       }
       currentSection = {
         title: line.replace(/:$/, ""),
-        items: []
+        items: [],
       };
     } else {
       if (!currentSection) {
         currentSection = {
           title: "Clinical Summary",
-          items: []
+          items: [],
         };
       }
       const cleanedLine = line.replace(/^[•\-\*\s]+/, "");
@@ -82,7 +85,7 @@ export default function PatientSummariesPage() {
   useEffect(() => {
     if (reports && reports.length > 0 && selectedReportId === null) {
       // Find the first report that has a summary, or default to the first one
-      const withSummary = reports.find(r => r.summary);
+      const withSummary = reports.find((r) => r.summary);
       setSelectedReportId(withSummary ? withSummary.id : reports[0].id);
     }
   }, [reports, selectedReportId]);
@@ -94,13 +97,15 @@ export default function PatientSummariesPage() {
     mutationFn: (reportId: number) => reportService.summarize(reportId),
     onSuccess: () => {
       toast.success("AI Summary generated successfully");
-      queryClient.invalidateQueries({ queryKey: ["patient-reports", patient?.id] });
+      queryClient.invalidateQueries({
+        queryKey: ["patient-reports", patient?.id],
+      });
     },
     onError: () => {
       toast.error("Failed to generate AI summary", {
-        description: "AI service might be offline or report content is empty."
+        description: "AI service might be offline or report content is empty.",
       });
-    }
+    },
   });
 
   const handleCopy = () => {
@@ -117,7 +122,9 @@ export default function PatientSummariesPage() {
       toast.error("No summary content to download");
       return;
     }
-    const blob = new Blob([selectedReport.summary], { type: "text/plain;charset=utf-8" });
+    const blob = new Blob([selectedReport.summary], {
+      type: "text/plain;charset=utf-8",
+    });
     const url = URL.createObjectURL(blob);
     const link = document.createElement("a");
     link.href = url;
@@ -132,7 +139,7 @@ export default function PatientSummariesPage() {
     toast.promise(regenerateMutation.mutateAsync(selectedReportId), {
       loading: "Regenerating AI Summary...",
       success: "Summary updated!",
-      error: "Regeneration failed."
+      error: "Regeneration failed.",
     });
   };
 
@@ -147,7 +154,7 @@ export default function PatientSummariesPage() {
             AI-generated findings, conditions, and recommendations.
           </p>
         </div>
-        
+
         {reports && reports.length > 0 && (
           <div className="flex flex-wrap gap-2">
             <Button
@@ -169,9 +176,14 @@ export default function PatientSummariesPage() {
             <Button
               size="sm"
               onClick={handleRegenerate}
-              disabled={selectedReportId === null || regenerateMutation.isPending}
+              disabled={
+                selectedReportId === null || regenerateMutation.isPending
+              }
             >
-              <RefreshCw className={`h-4 w-4 mr-1 ${regenerateMutation.isPending ? "animate-spin" : ""}`} /> Regenerate
+              <RefreshCw
+                className={`h-4 w-4 mr-1 ${regenerateMutation.isPending ? "animate-spin" : ""}`}
+              />{" "}
+              Regenerate
             </Button>
           </div>
         )}
@@ -181,17 +193,20 @@ export default function PatientSummariesPage() {
         <TableSkeleton rows={4} />
       ) : !reports || reports.length === 0 ? (
         <p className="text-sm text-muted-foreground py-8 text-center border rounded-lg bg-card">
-          No medical reports found. Upload a report using a doctor account first to generate summaries.
+          No medical reports found. Upload a report using a doctor account first
+          to generate summaries.
         </p>
       ) : (
         <div className="space-y-4">
-          <div className="flex items-center gap-3">
-            <span className="text-sm text-muted-foreground">Select Report:</span>
+          <div className="flex flex-col sm:flex-row sm:items-center gap-3">
+            <span className="text-sm text-muted-foreground shrink-0">
+              Select Report:
+            </span>
             <Select
               value={String(selectedReportId ?? "")}
               onValueChange={(val) => setSelectedReportId(Number(val))}
             >
-              <SelectTrigger className="w-[300px]">
+              <SelectTrigger className="w-full sm:w-[300px]">
                 <SelectValue placeholder="Select a report to view" />
               </SelectTrigger>
               <SelectContent>
@@ -216,8 +231,15 @@ export default function PatientSummariesPage() {
                   <p className="text-sm text-muted-foreground">
                     No summary generated yet for this report.
                   </p>
-                  <Button size="sm" onClick={handleRegenerate} disabled={regenerateMutation.isPending}>
-                    <RefreshCw className={`h-4 w-4 mr-1 ${regenerateMutation.isPending ? "animate-spin" : ""}`} /> Generate AI Summary
+                  <Button
+                    size="sm"
+                    onClick={handleRegenerate}
+                    disabled={regenerateMutation.isPending}
+                  >
+                    <RefreshCw
+                      className={`h-4 w-4 mr-1 ${regenerateMutation.isPending ? "animate-spin" : ""}`}
+                    />{" "}
+                    Generate AI Summary
                   </Button>
                 </div>
               ) : (
@@ -234,4 +256,3 @@ export default function PatientSummariesPage() {
     </div>
   );
 }
-

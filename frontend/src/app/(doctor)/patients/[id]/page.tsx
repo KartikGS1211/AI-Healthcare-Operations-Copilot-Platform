@@ -31,24 +31,27 @@ export default function PatientDetailPage({
   });
 
   const fallback = mockPatients.find((p) => p.id === id);
-  const display = patient ?? (fallback && {
-    id: patientId,
-    full_name: fallback.name,
-    age: fallback.age,
-    gender: fallback.gender,
-    phone: fallback.phone ?? "",
-    created_at: new Date().toISOString(),
-  });
+  const display =
+    patient ??
+    (fallback && {
+      id: patientId,
+      full_name: fallback.name,
+      age: fallback.age,
+      gender: fallback.gender,
+      phone: fallback.phone ?? "",
+      created_at: new Date().toISOString(),
+    });
 
-  const timelineEvents = reports && reports.length > 0
-    ? reports.map((report) => ({
-        id: String(report.id),
-        date: new Date(report.uploaded_at).toLocaleDateString(),
-        title: `${report.report_type.toUpperCase()} Report Uploaded`,
-        description: `File: ${report.file_name}`,
-        category: "report" as const,
-      }))
-    : patientTimeline;
+  const timelineEvents =
+    reports && reports.length > 0
+      ? reports.map((report) => ({
+          id: String(report.id),
+          date: new Date(report.uploaded_at).toLocaleDateString(),
+          title: `${report.report_type.toUpperCase()} Report Uploaded`,
+          description: `File: ${report.file_name}`,
+          category: "report" as const,
+        }))
+      : patientTimeline;
 
   if (isLoading && !display) {
     return <CardGridSkeleton count={2} />;
@@ -64,7 +67,9 @@ export default function PatientDetailPage({
         <CardHeader>
           <div className="flex flex-wrap items-center gap-2">
             <CardTitle>{display.full_name}</CardTitle>
-            <Badge variant="outline" className="capitalize">{display.gender}</Badge>
+            <Badge variant="outline" className="capitalize">
+              {display.gender}
+            </Badge>
             <Badge variant="secondary">Age {display.age}</Badge>
           </div>
         </CardHeader>
@@ -91,13 +96,18 @@ export default function PatientDetailPage({
           </CardHeader>
           <CardContent className="space-y-3">
             {(reports ?? []).length === 0 ? (
-              <p className="text-sm text-muted-foreground">No reports uploaded yet.</p>
+              <p className="text-sm text-muted-foreground">
+                No reports uploaded yet.
+              </p>
             ) : (
               reports?.map((report) => (
-                <div key={report.id} className="rounded-lg border p-3">
-                  <p className="font-medium">{report.file_name}</p>
+                <div key={report.id} className="min-w-0 rounded-lg border p-3">
+                  <p className="font-medium truncate" title={report.file_name}>
+                    {report.file_name}
+                  </p>
                   <p className="text-sm text-muted-foreground">
-                    {report.report_type} · {new Date(report.uploaded_at).toLocaleDateString()}
+                    {report.report_type} ·{" "}
+                    {new Date(report.uploaded_at).toLocaleDateString()}
                   </p>
                 </div>
               ))
