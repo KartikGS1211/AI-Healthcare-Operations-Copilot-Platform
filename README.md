@@ -33,15 +33,25 @@ The **AI Healthcare Operations Copilot** is a production-ready, full-stack clini
 
 ---
 
-## Core Problems Solved
+## Problem & Solution
 
-| Problem                       | Impact                                                                  | Solution                                                       |
-| ----------------------------- | ----------------------------------------------------------------------- | -------------------------------------------------------------- |
-| **Doctor Burnout**            | Doctors spend up to 40% of their day on manual data entry and paperwork | Automated OCR → AI pipeline eliminates manual transcription    |
-| **Medication Non-Compliance** | Patients misunderstand complex medical jargon on prescriptions          | AI-generated plain-language summaries of medical reports       |
-| **Prescription Safety Risks** | Manual drug-drug cross-referencing is tedious and error-prone           | Automated drug-drug interaction checker backed by RAG evidence |
+Small clinics often lack proper tools for reviewing patient history and
+checking drug safety. Doctors manually go through old reports and
+prescriptions, drug-interaction checks are done from memory, and scanned
+documents stay unstructured and unsearchable. Enterprise tools (Lexicomp,
+Micromedex, full EHRs) solve this but are too expensive for smaller setups.
 
----
+This platform automates that workflow using a multi-agent AI pipeline:
+
+| Problem                         | Solution                                                                         |
+| ------------------------------- | -------------------------------------------------------------------------------- |
+| Manual report reading           | OCR (PyMuPDF + Tesseract) extracts text automatically                            |
+| No summarization                | Summary Agent (Groq/Llama-3.3-70B) generates clinical summaries                  |
+| Inconsistent interaction checks | Interaction Agent + RAG (ChromaDB) flags drug conflicts                          |
+| Unstructured data               | Prescription Agent extracts medicines & dosages from OCR text                    |
+| No unified view                 | Doctor Portal shows patients, reports, prescriptions & interactions in one place |
+| No patient visibility           | Patient Portal shows active meds and safety warnings                             |
+| Disconnected tools              | Coordinator Agent runs the full OCR → extract → summarize → check pipeline       |
 
 ## Key Features
 
@@ -532,7 +542,3 @@ docker run -p 3000:3000 healthcare-frontend
 | `NEXT_PUBLIC_API_URL` | Base URL of the FastAPI backend (e.g. `http://localhost:8000`) |
 
 ---
-
-<div align="center">
-  <sub>Built with ❤️ by Kartik Sarode — AI Healthcare Operations Copilot Platform</sub>
-</div>
