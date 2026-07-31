@@ -3,10 +3,12 @@ import fitz
 # pyrefly: ignore [missing-import]
 import pytesseract
 import os
+# pyrefly: ignore [missing-import]
 from fastapi import HTTPException, status
 
 # pyrefly: ignore [missing-import]
 from PIL import Image
+
 
 class FileMock:
     def __init__(self, file_path: str):
@@ -27,6 +29,7 @@ class FileMock:
             self.file.close()
         except Exception:
             pass
+
 
 def validate_upload(file):
     allowed_types = ["application/pdf", "image/jpeg", "image/png"]
@@ -55,59 +58,66 @@ def validate_upload(file):
             detail="File size exceeds maximum limit of 10 MB."
         )
 
+
 class OCRServices:
 
     @staticmethod
-    def extract_pdf_text(
-        file_path:str
-    ) -> str:
-
-        # Call validation before OCR processing begins
+    def extract_pdf_text(file_path: str) -> str:
+        """
+        Extract text from a PDF file.
+        Strategy:
+          1. Try native text extraction with PyMuPDF (fast, works for text-based PDFs).
+          2. If native extraction returns empty (scanned / image-based PDFs like DocScanner
+             output), render each page as a high-resolution image and run Tesseract OCR on it.
+        """
         validate_upload(FileMock(file_path))
 
         try:
-            document= fitz.open(file_path)
+            document = fitz.open(file_path)
+            extracted_text = ""
 
-            extracted_text=""
-
+            # --- Pass 1: native text extraction ---
             for page in document:
                 extracted_text += page.get_text()
 
-            document.close()
+            # --- Pass 2: OCR fallback for scanned / image-only PDFs ---
+            if not extracted_text.strip():
+                ocr_text = ""
+                for page in document:
+                    # Render page at 300 DPI (matrix scale = 300/72 ≈ 4.17)
+                    zoom = 300 / 72
+                    mat = fitz.Matrix(zoom, zoom)
+                    pix = page.get_pixmap(matrix=mat, alpha=False)
 
+                    # Convert pixmap → PIL Image → Tesseract
+                    img = Image.frombytes(
+                        "RGB",
+                        [pix.width, pix.height],
+                        pix.samples
+                    )
+                    page_text = pytesseract.image_to_string(img, lang="eng")
+                    ocr_text += page_text + "\n"
+
+                extracted_text = ocr_text
+
+            document.close()
             return extracted_text.strip()
 
         except HTTPException:
             raise
         except Exception as e:
-            raise Exception(
-                f"PDF OCR Failed: {str(e)}"
-            )
+            raise Exception(f"PDF OCR Failed: {str(e)}")
 
     @staticmethod
-    def extract_image_text(
-        file_path:str
-    ) -> str:
-
-        # Call validation before OCR processing begins
+    def extract_image_text(file_path: str) -> str:
         validate_upload(FileMock(file_path))
 
         try:
-            image =Image.open(file_path)
-
-            text = pytesseract.image_to_string(
-                image 
-            )
-
-            text=pytesseract.image_to_string(
-                image
-            )
-
+            image = Image.open(file_path)
+            text = pytesseract.image_to_string(image, lang="eng")
             return text.strip()
 
         except HTTPException:
             raise
         except Exception as e:
-            raise Exception(
-                f"Image OCR Failed:{str(e)}"
-            )
+            raise Exception(f"Image OCR Failed: {str(e)}")
