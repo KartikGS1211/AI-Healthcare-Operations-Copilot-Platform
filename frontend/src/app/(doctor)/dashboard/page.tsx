@@ -59,7 +59,6 @@ export default function DoctorDashboardPage() {
     queryFn: () => analyticsService.getMonthlyTrends(),
   });
 
-
   const kpis = [
     {
       title: "Patients Processed",
@@ -96,10 +95,7 @@ export default function DoctorDashboardPage() {
         id: String(report.id),
         title: "Report Uploaded",
         description: `${report.file_name} (${report.report_type})`,
-        timestamp: new Date(report.uploaded_at).toLocaleTimeString([], {
-          hour: "2-digit",
-          minute: "2-digit",
-        }),
+        timestamp: report.uploaded_at, // raw ISO string → ActivityFeed computes relative time
         type: "report" as const,
       }))
     : [];
@@ -112,13 +108,17 @@ export default function DoctorDashboardPage() {
 
   const monthlyTrendsData = monthlyTrends ?? [];
 
-
   if (isLoading && !overview) {
     return <DashboardSkeleton />;
   }
 
   return (
-    <motion.div variants={staggerContainer} initial="initial" animate="animate" className="space-y-6">
+    <motion.div
+      variants={staggerContainer}
+      initial="initial"
+      animate="animate"
+      className="space-y-6"
+    >
       <motion.div variants={fadeInUp}>
         <h2 className="text-2xl font-bold tracking-tight">
           Welcome back, {user?.name}
@@ -128,7 +128,10 @@ export default function DoctorDashboardPage() {
         </p>
       </motion.div>
 
-      <motion.div variants={fadeInUp} className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+      <motion.div
+        variants={fadeInUp}
+        className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4"
+      >
         {kpis.map((metric) => (
           <StatCard key={metric.title} metric={metric} />
         ))}
@@ -151,7 +154,7 @@ export default function DoctorDashboardPage() {
                 onClick={() => toast.info(`Opening ${action.label}`)}
                 className={cn(
                   buttonVariants({ variant: "outline" }),
-                  "h-auto justify-start border-border/50 bg-background/50 py-3 backdrop-blur-sm"
+                  "h-auto justify-start border-border/50 bg-background/50 py-3 backdrop-blur-sm",
                 )}
               >
                 <action.icon className="mr-2 h-4 w-4 text-primary" />

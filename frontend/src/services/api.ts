@@ -1,8 +1,7 @@
 import axios from "axios";
 import { useAuthStore } from "@/store/auth-store";
 
-const API_BASE_URL =
-  process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:8000";
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:8000";
 
 export const api = axios.create({
   baseURL: API_BASE_URL,
@@ -35,13 +34,25 @@ const processQueue = (error: any, token: string | null = null) => {
 
 api.interceptors.response.use(
   (response) => {
-    if (response.config.url?.endsWith("/auth/login") && response.data?.refresh_token) {
+    if (
+      response.config.url?.endsWith("/auth/login") &&
+      response.data?.refresh_token
+    ) {
       localStorage.setItem("refresh_token", response.data.refresh_token);
     }
     return response;
   },
   async (error) => {
     const originalRequest = error.config;
+
+    // Skip auto-logout for auth endpoints — let onError handle it
+    const isAuthEndpoint =
+      originalRequest?.url?.includes("/auth/login") ||
+      originalRequest?.url?.includes("/auth/register");
+
+    if (isAuthEndpoint) {
+      return Promise.reject(error);
+    }
 
     if (error.response?.status === 401 && !originalRequest._retry) {
       if (originalRequest.url?.includes("/auth/refresh")) {
@@ -69,7 +80,10 @@ api.interceptors.response.use(
 
       isRefreshing = true;
 
-      const refreshToken = typeof window !== "undefined" ? localStorage.getItem("refresh_token") : null;
+      const refreshToken =
+        typeof window !== "undefined"
+          ? localStorage.getItem("refresh_token")
+          : null;
 
       if (!refreshToken) {
         useAuthStore.getState().logout();
@@ -90,7 +104,8 @@ api.interceptors.response.use(
         }
         useAuthStore.setState({ token: newAccessToken });
 
-        api.defaults.headers.common["Authorization"] = `Bearer ${newAccessToken}`;
+        api.defaults.headers.common["Authorization"] =
+          `Bearer ${newAccessToken}`;
         originalRequest.headers.Authorization = `Bearer ${newAccessToken}`;
 
         processQueue(null, newAccessToken);
@@ -109,6 +124,5 @@ api.interceptors.response.use(
     }
 
     return Promise.reject(error);
-  }
+  },
 );
-

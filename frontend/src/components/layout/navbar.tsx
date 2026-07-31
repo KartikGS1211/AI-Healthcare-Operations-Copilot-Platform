@@ -64,18 +64,18 @@ export function Navbar({
     }
   }, []);
 
-  // Fetch live notifications
+  // Fetch live notifications — with silent backoff on network errors
   useEffect(() => {
     if (!user) return;
 
     let active = true;
+    let consecutiveFailures = 0;
 
     async function fetchNotifications() {
       try {
         const list: typeof notifications = [];
 
         if (user?.role === "doctor") {
-          // Fetch reports
           const reports = await reportService.getAll();
           reports.forEach((report) => {
             list.push({
@@ -88,59 +88,62 @@ export function Navbar({
             });
           });
         } else if (user?.role === "patient") {
-          try {
-            const me = await patientService.getMe();
-            if (me?.id) {
-              const [reports, interactions] = await Promise.all([
-                reportService.getByPatient(me.id),
-                interactionService.getByPatient(me.id),
-              ]);
+          const me = await patientService.getMe().catch(() => null);
+          if (me?.id) {
+            const [reports, interactions] = await Promise.all([
+              reportService.getByPatient(me.id).catch(() => []),
+              interactionService.getByPatient(me.id).catch(() => []),
+            ]);
 
-              reports.forEach((report) => {
-                list.push({
-                  id: `report-${report.id}`,
-                  title: `Medical Report Processed`,
-                  desc: `Your ${report.report_type} report (${report.file_name}) has been summarized.`,
-                  time: formatRelativeTime(
-                    new Date(report.uploaded_at).getTime(),
-                  ),
-                  unread: !readIds.includes(`report-${report.id}`),
-                  timestamp: new Date(report.uploaded_at).getTime(),
-                });
+            reports.forEach((report) => {
+              list.push({
+                id: `report-${report.id}`,
+                title: `Medical Report Processed`,
+                desc: `Your ${report.report_type} report (${report.file_name}) has been summarized.`,
+                time: formatRelativeTime(
+                  new Date(report.uploaded_at).getTime(),
+                ),
+                unread: !readIds.includes(`report-${report.id}`),
+                timestamp: new Date(report.uploaded_at).getTime(),
               });
+            });
 
-              interactions.forEach((interaction) => {
-                const ts = new Date(
-                  interaction.created_at || Date.now(),
-                ).getTime();
-                list.push({
-                  id: `interaction-${interaction.id}`,
-                  title: `${interaction.severity.toUpperCase()} Interaction Warning`,
-                  desc: `Potential conflict between ${interaction.drug_1} and ${interaction.drug_2}.`,
-                  time: formatRelativeTime(ts),
-                  unread: !readIds.includes(`interaction-${interaction.id}`),
-                  timestamp: ts,
-                });
+            interactions.forEach((interaction) => {
+              const ts = new Date(
+                interaction.created_at || Date.now(),
+              ).getTime();
+              list.push({
+                id: `interaction-${interaction.id}`,
+                title: `${interaction.severity.toUpperCase()} Interaction Warning`,
+                desc: `Potential conflict between ${interaction.drug_1} and ${interaction.drug_2}.`,
+                time: formatRelativeTime(ts),
+                unread: !readIds.includes(`interaction-${interaction.id}`),
+                timestamp: ts,
               });
-            }
-          } catch (err) {
-            console.error("Failed to load patient notifications", err);
+            });
           }
         }
 
-        // Sort by timestamp desc (newest first)
         list.sort((a, b) => b.timestamp - a.timestamp);
+        consecutiveFailures = 0; // reset on success
 
         if (active) {
-          setNotifications(list.slice(0, 15)); // Limit to most recent 15
+          setNotifications(list.slice(0, 15));
         }
-      } catch (err) {
-        console.error("Failed to load notifications", err);
+      } catch {
+        // Silent backoff — only log the first failure, not every poll
+        consecutiveFailures += 1;
+        if (consecutiveFailures === 1) {
+          console.warn(
+            "[Notifications] Backend unreachable, will retry silently.",
+          );
+        }
       }
     }
 
     fetchNotifications();
-    const interval = setInterval(fetchNotifications, 15000); // Poll every 15s
+    // Poll every 30s (was 15s) — less aggressive
+    const interval = setInterval(fetchNotifications, 30_000);
 
     return () => {
       active = false;

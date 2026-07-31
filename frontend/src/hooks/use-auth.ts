@@ -19,25 +19,38 @@ export function useAuth() {
     onSuccess: (data, variables) => {
       const role = data.role as UserRole;
       const name =
-        role === "doctor" ? "Dr. " + variables.email.split("@")[0] : variables.email.split("@")[0];
+        role === "doctor"
+          ? "Dr. " + variables.email.split("@")[0]
+          : variables.email.split("@")[0];
 
       setAuth(
         {
-          name: name.replace(/\./g, " ").replace(/\b\w/g, (c) => c.toUpperCase()),
+          name: name
+            .replace(/\./g, " ")
+            .replace(/\b\w/g, (c) => c.toUpperCase()),
           email: variables.email,
           role,
           initials: getInitials(name),
         },
-        data.access_token
+        data.access_token,
       );
 
       toast.success("Welcome back!");
       router.replace(getRoleRedirect(role));
     },
-    onError: () => {
-      toast.error("Authentication failed", {
-        description: "Invalid email or password.",
-      });
+    onError: (error: {
+      response?: { status?: number; data?: { detail?: string } };
+    }) => {
+      if (error.response?.status === 429) {
+        toast.error("Too many attempts", {
+          description: "Please wait a minute before trying again.",
+        });
+      } else {
+        toast.error("Login failed", {
+          description:
+            error.response?.data?.detail ?? "Invalid email or password.",
+        });
+      }
     },
   });
 
@@ -51,7 +64,8 @@ export function useAuth() {
     },
     onError: (error: { response?: { data?: { detail?: string } } }) => {
       toast.error("Registration failed", {
-        description: error.response?.data?.detail ?? "Unable to create account.",
+        description:
+          error.response?.data?.detail ?? "Unable to create account.",
       });
     },
   });
