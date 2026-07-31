@@ -118,9 +118,9 @@ def get_patient_reports(
 @router.post(
     "/{report_id}/summarize"
 )
-def summarize_report(
-    report_id:int,
-    db: Session=Depends(get_db)
+async def summarize_report(
+    report_id: int,
+    db: Session = Depends(get_db)
 ):
 
     report = (
@@ -140,13 +140,12 @@ def summarize_report(
     if not report.extracted_text:
         raise HTTPException(
             status_code=400,
-            detail="OCR text not found"
+            detail="No text could be extracted from this report. "
+                   "Please ensure the PDF contains readable text."
         )
 
-    summary = (
-        SummaryAgent.generate_summary(
-            report.extracted_text
-        )
+    summary = await SummaryAgent.generate_summary_async(
+        report.extracted_text
     )
 
     ReportRepository.update_summary(
