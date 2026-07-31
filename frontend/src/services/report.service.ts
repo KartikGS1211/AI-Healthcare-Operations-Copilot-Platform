@@ -7,8 +7,15 @@ export const reportService = {
     return data;
   },
 
+  async getById(reportId: number): Promise<ApiReport> {
+    const { data } = await api.get<ApiReport>(`/reports/${reportId}`);
+    return data;
+  },
+
   async getByPatient(patientId: number): Promise<ApiReport[]> {
-    const { data } = await api.get<ApiReport[]>(`/reports/patient/${patientId}`);
+    const { data } = await api.get<ApiReport[]>(
+      `/reports/patient/${patientId}`,
+    );
     return data;
   },
 
@@ -30,7 +37,7 @@ export const reportService = {
 
   async summarize(reportId: number): Promise<{ summary: string }> {
     const { data } = await api.post<{ summary: string }>(
-      `/reports/${reportId}/summarize`
+      `/reports/${reportId}/summarize`,
     );
     return data;
   },

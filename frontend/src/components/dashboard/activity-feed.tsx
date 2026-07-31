@@ -51,11 +51,13 @@ function getRelativeTime(timestamp: string): string {
 interface ActivityFeedProps {
   items: ActivityItem[];
   title?: string;
+  onItemClick?: (id: string) => void;
 }
 
 export function ActivityFeed({
   items,
   title = "Recent Activity",
+  onItemClick,
 }: ActivityFeedProps) {
   // Tick every 30 seconds so relative times stay fresh
   const [, setTick] = useState(0);
@@ -82,7 +84,12 @@ export function ActivityFeed({
               <motion.div
                 key={item.id}
                 variants={fadeInUp}
-                className="flex items-start gap-3 rounded-lg border border-border/50 bg-background/50 p-3 transition-colors hover:bg-muted/50"
+                onClick={() => onItemClick?.(item.id)}
+                className={`flex items-start gap-3 rounded-lg border border-border/50 bg-background/50 p-3 transition-colors hover:bg-muted/50 ${
+                  onItemClick
+                    ? "cursor-pointer hover:border-primary/30 hover:ring-1 hover:ring-primary/10"
+                    : ""
+                }`}
               >
                 <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-primary/10">
                   <Icon className="h-4 w-4 text-primary" />

@@ -1,27 +1,21 @@
 "use client";
 
 import Link from "next/link";
+import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { motion } from "framer-motion";
-import {
-  BarChart3,
-  FileText,
-  GitBranch,
-  Pill,
-  Sparkles,
-  Upload,
-} from "lucide-react";
+import { GitBranch, Pill, Sparkles, Upload } from "lucide-react";
 import { toast } from "sonner";
 import { StatCard } from "@/components/dashboard/stat-card";
 import { AnalyticsChart } from "@/components/dashboard/analytics-chart";
 import { ActivityFeed } from "@/components/dashboard/activity-feed";
+import { ReportDrawer } from "@/components/dashboard/report-drawer";
 import { DashboardSkeleton } from "@/components/dashboard/loading-skeleton";
 import { buttonVariants } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { cn } from "@/lib/utils";
 import { useAuthStore } from "@/store/auth-store";
 import { analyticsService } from "@/services/analytics.service";
-
 import { staggerContainer, fadeInUp } from "@/lib/animations";
 
 const quickActions = [
@@ -33,6 +27,7 @@ const quickActions = [
 
 export default function DoctorDashboardPage() {
   const user = useAuthStore((s) => s.user);
+  const [selectedReportId, setSelectedReportId] = useState<number | null>(null);
 
   const { data: overview, isLoading } = useQuery({
     queryKey: ["analytics-overview"],
@@ -113,95 +108,106 @@ export default function DoctorDashboardPage() {
   }
 
   return (
-    <motion.div
-      variants={staggerContainer}
-      initial="initial"
-      animate="animate"
-      className="space-y-6"
-    >
-      <motion.div variants={fadeInUp}>
-        <h2 className="text-2xl font-bold tracking-tight">
-          Welcome back, {user?.name}
-        </h2>
-        <p className="text-muted-foreground">
-          Here&apos;s an overview of your healthcare AI operations today.
-        </p>
-      </motion.div>
-
+    <>
       <motion.div
-        variants={fadeInUp}
-        className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4"
+        variants={staggerContainer}
+        initial="initial"
+        animate="animate"
+        className="space-y-6"
       >
-        {kpis.map((metric) => (
-          <StatCard key={metric.title} metric={metric} />
-        ))}
-      </motion.div>
+        <motion.div variants={fadeInUp}>
+          <h2 className="text-2xl font-bold tracking-tight">
+            Welcome back, {user?.name}
+          </h2>
+          <p className="text-muted-foreground">
+            Here&apos;s an overview of your healthcare AI operations today.
+          </p>
+        </motion.div>
 
-      <div className="grid gap-6 lg:grid-cols-3">
-        <div className="lg:col-span-2">
-          <ActivityFeed items={activities} />
+        <motion.div
+          variants={fadeInUp}
+          className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4"
+        >
+          {kpis.map((metric) => (
+            <StatCard key={metric.title} metric={metric} />
+          ))}
+        </motion.div>
+
+        <div className="grid gap-6 lg:grid-cols-3">
+          <div className="lg:col-span-2">
+            <ActivityFeed
+              items={activities}
+              onItemClick={(id) => setSelectedReportId(Number(id))}
+            />
+          </div>
+
+          <Card className="border-border/50 bg-card/80 shadow-sm backdrop-blur-sm">
+            <CardHeader>
+              <CardTitle className="text-base">Quick Actions</CardTitle>
+            </CardHeader>
+            <CardContent className="grid gap-2">
+              {quickActions.map((action) => (
+                <Link
+                  key={action.label}
+                  href={action.href}
+                  onClick={() => toast.info(`Opening ${action.label}`)}
+                  className={cn(
+                    buttonVariants({ variant: "outline" }),
+                    "h-auto justify-start border-border/50 bg-background/50 py-3 backdrop-blur-sm",
+                  )}
+                >
+                  <action.icon className="mr-2 h-4 w-4 text-primary" />
+                  {action.label}
+                </Link>
+              ))}
+            </CardContent>
+          </Card>
         </div>
 
-        <Card className="border-border/50 bg-card/80 shadow-sm backdrop-blur-sm">
-          <CardHeader>
-            <CardTitle className="text-base">Quick Actions</CardTitle>
-          </CardHeader>
-          <CardContent className="grid gap-2">
-            {quickActions.map((action) => (
-              <Link
-                key={action.label}
-                href={action.href}
-                onClick={() => toast.info(`Opening ${action.label}`)}
-                className={cn(
-                  buttonVariants({ variant: "outline" }),
-                  "h-auto justify-start border-border/50 bg-background/50 py-3 backdrop-blur-sm",
-                )}
-              >
-                <action.icon className="mr-2 h-4 w-4 text-primary" />
-                {action.label}
-              </Link>
-            ))}
-          </CardContent>
-        </Card>
-      </div>
+        <div className="grid gap-6 lg:grid-cols-2">
+          <AnalyticsChart
+            title="Weekly Analysis"
+            description="Reports analyzed vs prescriptions processed"
+            data={weeklyTrendsData}
+            type="area"
+            dataKeys={["reports", "prescriptions"]}
+            animated
+          />
+          <AnalyticsChart
+            title="Monthly Analysis"
+            description="Total prescriptions processed per month"
+            data={monthlyTrendsData}
+            type="bar"
+            dataKeys={["value"]}
+            animated
+          />
+        </div>
 
-      <div className="grid gap-6 lg:grid-cols-2">
-        <AnalyticsChart
-          title="Weekly Analysis"
-          description="Reports analyzed vs prescriptions processed"
-          data={weeklyTrendsData}
-          type="area"
-          dataKeys={["reports", "prescriptions"]}
-          animated
-        />
-        <AnalyticsChart
-          title="Monthly Analysis"
-          description="Total prescriptions processed per month"
-          data={monthlyTrendsData}
-          type="bar"
-          dataKeys={["value"]}
-          animated
-        />
-      </div>
+        <div className="grid gap-6 lg:grid-cols-2">
+          <AnalyticsChart
+            title="Top Medicines"
+            description="Most prescribed medicines"
+            data={topMedsData}
+            type="bar"
+            dataKeys={["value"]}
+            animated
+          />
+          <AnalyticsChart
+            title="Interaction Trends"
+            description="Drug interaction alerts over time"
+            data={weeklyTrendsData}
+            type="line"
+            dataKeys={["interactions"]}
+            animated
+          />
+        </div>
+      </motion.div>
 
-      <div className="grid gap-6 lg:grid-cols-2">
-        <AnalyticsChart
-          title="Top Medicines"
-          description="Most prescribed medicines"
-          data={topMedsData}
-          type="bar"
-          dataKeys={["value"]}
-          animated
-        />
-        <AnalyticsChart
-          title="Interaction Trends"
-          description="Drug interaction alerts over time"
-          data={weeklyTrendsData}
-          type="line"
-          dataKeys={["interactions"]}
-          animated
-        />
-      </div>
-    </motion.div>
+      {/* Report Detail Drawer */}
+      <ReportDrawer
+        reportId={selectedReportId}
+        onClose={() => setSelectedReportId(null)}
+      />
+    </>
   );
 }
