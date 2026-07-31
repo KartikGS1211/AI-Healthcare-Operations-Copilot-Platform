@@ -100,14 +100,19 @@ def get_top_medicines(
     "/recent-reports"
 )
 def recent_reports(
-    db:Session=Depends(get_db)
+    db: Session = Depends(get_db),
+    current_user=Depends(doctor_required),
 ):
+    doctor_email = current_user["sub"]
 
-    reports=(
-        db.query(Report)
-        .order_by(
-            Report.uploaded_at.desc()
-        )
+    # Filter by this doctor; fall back to all if uploaded_by is NULL (legacy)
+    query = db.query(Report).filter(
+        (Report.uploaded_by == doctor_email) | (Report.uploaded_by == None)  # noqa: E711
+    )
+
+    reports = (
+        query
+        .order_by(Report.uploaded_at.desc())
         .limit(10)
         .all()
     )

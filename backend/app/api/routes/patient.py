@@ -15,6 +15,7 @@ from app.schemas.patient import (
 from app.core.dependencies import doctor_required, get_current_user
 from app.models.patient import Patient
 from app.models.user import User
+# pyrefly: ignore [missing-import]
 from app.models.report import Report
 from app.models.prescription import Prescription
 from app.models.interaction import Interaction
